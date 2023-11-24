@@ -57,7 +57,7 @@ jobs:
      run: |
        cd ./data
        ls -lrt
-       rm package-lock.json
+       # rm package-lock.json
        npm clean-install
        # npm ci --legacy-peer-deps 
        serverless deploy --stage test --verbose --debug *
