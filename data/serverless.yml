@@ -1,4 +1,4 @@
-service: data
+service: vdata
 frameworkVersion: '3'
 
 provider:
