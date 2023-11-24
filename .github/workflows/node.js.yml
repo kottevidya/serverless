@@ -47,6 +47,7 @@ jobs:
        pip install poetry
    - name: Installing Serverless
      run: |
+       npm install
        npm install -g serverless
    - name: Deploy to AWS	
      run: cd ./data && npm ci && serverless deploy --stage test --verbose --debug *
