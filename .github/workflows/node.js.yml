@@ -1,0 +1,55 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
+
+on:
+ push:
+   branches: [ "main" ]
+ pull_request:
+   branches: [ "main" ]
+
+jobs:
+ # changed-files:
+ #  runs-on: ubuntu-latest
+ #  steps:
+ # - name: Files changed
+ #  run: |
+ #    echo "Files changed:"
+ #    echo "${{ toJson(github.event.pull_request.changed_files) }}
+ #    result:           ${{ github.event_name == 'pull_request' && ( contains(github.event.pull_request.changed_files.*.name, 'ui') || contains(github.event.pull_request.changed_files.*.name, '.github/workflows') ) }}
+ #    is pull request:  ${{ github.event_name == 'pull_request' }}
+ #    is ui folder:     ${{ contains(github.event.pull_request.changed_files.*.name, 'ui') }}
+ #    is .github folder: ${{ contains(github.event.pull_request.changed_files.*.name, '.github') }}"
+
+ deploy-data:
+   if: ${{ github.event_name == 'push' }}
+   name: deploy-data
+   runs-on: ubuntu-latest
+   strategy:
+     matrix:
+       node-version: [18.x]
+       # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+   steps:
+   - uses: actions/checkout@v3
+   - name: Set up Node.js environment 
+     uses: actions/setup-node@v3
+     with:
+       node-version: ${{ matrix.node-version }}
+   - name: Setup Python environment
+     uses: actions/setup-python@v4
+     with:
+       python-version: "3.10"
+   - name: Install Poetry
+     run: |
+       python -m pip install --upgrade pip
+       pip install poetry
+   - name: Installing Serverless
+     run: |
+       npm install -g serverless
+   - name: Deploy to AWS	
+     run: cd ./data && npm ci && serverless deploy --stage test --verbose --debug *
+     env:
+       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
