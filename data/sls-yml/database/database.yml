@@ -1,0 +1,15 @@
+Resources:
+  DatabaseRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: ${self:service}-${EnvironmentName}-db-${AWS::Region}-role  # Replace with your desired role name
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'rds.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AmazonRDSDataFullAccess'
+        - 'arn:aws:iam::aws:policy/AmazonRDSFullAccess'

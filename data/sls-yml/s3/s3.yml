@@ -1,0 +1,50 @@
+Resources:
+  RawZoneBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ${self:custom.prefix}-raw-zone-bucket
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: 'aws:kms'
+            #SSEAlgorithm: AES256
+            KMSMasterKeyID:
+              Ref: RDSDBKMSKey
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: 'true'
+        BlockPublicPolicy: 'true'
+        IgnorePublicAcls: 'true'
+        RestrictPublicBuckets: 'true'
+      Tags:
+        - Key: 'Project'
+          Value: 'velocity'
+        - Key: 'Name'
+          Value: 'velocity'
+        - Key: 'Environment'
+          Value: 'scan'
+        - Key: "CreatedBy"
+          Value: "DevOpsInfra"
+
+  RawZoneS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: RawZoneBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Id: ExamplePolicy
+        Statement:
+        - Sid: AllowSSLRequestsOnly
+          Effect: Deny
+          Principal: "*"
+          Action: s3:*
+          Resource:
+          - !Join [ '', [ 'arn:aws:s3:::', !Ref RawZoneBucket ] ]
+          - !Join [ '', [ 'arn:aws:s3:::', !Ref RawZoneBucket, '/*' ] ]
+          Condition:
+            Bool:
+              aws:SecureTransport: 'false'
+
+

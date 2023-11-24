@@ -1,0 +1,81 @@
+Resources:
+  Role:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: ${self:custom.parameters.lambdaRoleName}
+      Tags:
+      - Key: "CreatedBy"
+        Value: "DevOpsInfra"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                #- rds.amazonaws.com
+                #- s3.amazonaws.com
+                #- cloudformation.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
+        - arn:aws:iam::aws:policy/AmazonRDSFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
+        # - arn:aws:iam::aws:policy/AmazonCognitoPowerUser
+        # - arn:aws:iam::aws:policy/AWSStepFunctionsConsoleFullAccess
+        - arn:aws:iam::aws:policy/AmazonAPIGatewayAdministrator
+        - arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess
+        #- arn:aws:iam::aws:policy/AWSLambdaRole
+        # - arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess
+        # - arn:aws:iam::aws:policy/AWSCloudFormationFullAccess
+        #- arn:aws:iam::aws:policy/AmazonS3ObjectLambdaExecutionRolePolicy
+
+
+      Policies:
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutBucketPolicy
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                Resource: '*'
+
+        # - PolicyName: LogGroupAccess
+        #   PolicyDocument:
+        #     Version: 2012-10-17
+        #     Statement:
+        #       - Effect: Allow
+        #         Action:
+        #            - logs:CreateLogGroup
+        #            - logs:CreateLogStream
+        #            - logs:PutLogEvents
+        #         Resource: 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*'
+        # - PolicyName: APIGatewayAccess
+        #   PolicyDocument:
+        #     Version: 2012-10-17
+        #     Statement:
+        #       - Effect: Allow
+        #         Action:
+        #            - execute-api:Invoke
+        #            - execute-api:ManageConnections
+        #         Resource: arn:aws:execute-api:*:*:*
+
+        - PolicyName: Networkinterfacepolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                   - ec2:DescribeNetworkInterfaces
+                   - ec2:CreateNetworkInterface
+                   - ec2:DeleteNetworkInterface
+                   - ec2:DescribeInstances
+                   - ec2:AttachNetworkInterface
+                Resource: '*'

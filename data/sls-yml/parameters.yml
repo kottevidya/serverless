@@ -1,0 +1,26 @@
+
+#lambda parameters
+lambdaRoleName: ${self:custom.prefix}-lambda-role
+#lambda parameters
+RdsdbRoleName: ${self:custom.prefix}-rdsdb-role
+#lambda parameters
+DBClusterIdentifier:  ${self:custom.prefix}-rdsdb-role
+#vpc parameters
+vpcCidr: '10.20.0.0/16'
+PublicSubnet1: '10.20.1.0/24'
+PublicSubnet2: '10.20.6.0/24'
+#PubavailabilityZone1: 'us-east-1a'
+
+PrivateSubnet1: '10.20.2.0/24'
+#PrivavailabilityZone1: 'us-east-1b'
+
+PrivateSubnet2: '10.20.3.0/24'
+#PrivavailabilityZone2: 'us-east-1c'
+
+DatabaseSubnet1: '10.20.4.0/24'
+#DbavailabilityZone1: 'us-east-1a'
+
+DatabaseSubnet2: '10.20.5.0/24'
+#DbavailabilityZone2: 'us-east-1b'
+
+#rds.yml parameters

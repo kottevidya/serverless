@@ -1,0 +1,60 @@
+Resources:
+  RDSDBCluster:
+    Type: 'AWS::RDS::DBCluster'
+    Properties:
+      Engine: 'aurora-postgresql'
+      DBClusterIdentifier: ${self:custom.prefix}-db-cluster
+      EngineVersion: 15.4 ##TODO - fix with parameters
+      MasterUsername:
+        Fn::Sub: "{{resolve:secretsmanager:${RDSDBClusterSecret}::username}}"
+      MasterUserPassword:
+        Fn::Sub: "{{resolve:secretsmanager:${RDSDBClusterSecret}::password}}"
+      ServerlessV2ScalingConfiguration:
+        MinCapacity: 2 #!Ref MinCapacity
+        MaxCapacity: 4 #!Ref MaxCapacity
+      StorageEncrypted: true
+      KmsKeyId:
+        Fn::GetAtt:
+          - RDSDBKMSKey
+          - Arn
+      DBSubnetGroupName:
+        Ref: MyDBSubnetGroup
+      VpcSecurityGroupIds:
+        - Ref: DatabaseSecurityGroup        
+
+  MyDBSubnetGroup:
+    Type: 'AWS::RDS::DBSubnetGroup'
+    Properties:
+      DBSubnetGroupDescription: 'Your DB Subnet Group Description'
+      SubnetIds:
+        - Ref: GWDATADBSubnet1
+        - Ref: GWDATADBSubnet2
+
+  RDSDBInstance:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      Engine: 'aurora-postgresql' #aurora-mysql
+      DBInstanceClass: db.serverless
+      DBClusterIdentifier:
+        Ref: RDSDBCluster
+
+
+  DatabaseSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'RDS Database Security Group'
+      VpcId:
+        Ref: GWDATAVPC
+      SecurityGroupIngress:
+        - CidrIp: '0.0.0.0/0' # Example inbound rule; Modify as needed
+          IpProtocol: 'tcp'
+          FromPort: 5432  # Modify according to your RDS port
+          ToPort: 5432
+  SecretRedshiftAttachment:
+    Type: AWS::SecretsManager::SecretTargetAttachment
+    Properties:
+      SecretId:
+        Ref: RDSDBClusterSecret
+      TargetId:
+        Ref: RDSDBCluster
+      TargetType: AWS::RDS::DBCluster

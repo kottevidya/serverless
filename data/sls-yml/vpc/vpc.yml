@@ -1,0 +1,239 @@
+Resources:
+  GWDATAVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: ${self:custom.parameters.vpcCidr}
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      Tags:
+      - Key: Name
+        Value: GWDATAVPC
+  GWDATAInternetGateway: 
+    Type: 'AWS::EC2::InternetGateway'
+    Properties: 
+      Tags: 
+      - Key: Name
+        Value: GWDATAInternetGateway
+  GWDATAInternetGatewayAttach:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties: 
+      InternetGatewayId: 
+        Ref:  GWDATAInternetGateway
+      VpcId: 
+        Ref:  GWDATAVPC
+  GWDATAPublicSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId:
+        Ref:  GWDATAVPC
+      CidrBlock: ${self:custom.parameters.PublicSubnet1}
+      AvailabilityZone: ${self:provider.region}a
+      Tags:
+      - Key: Name
+        Value: GWDATAPublicSubnet1
+  GWDATAPublicSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId:
+        Ref:  GWDATAVPC
+      CidrBlock: ${self:custom.parameters.PublicSubnet2}
+      AvailabilityZone: ${self:provider.region}b
+      Tags:
+      - Key: Name
+        Value: GWDATAPublicSubnet2
+  GWDATAPrivateSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId:
+        Ref:  GWDATAVPC
+      CidrBlock: ${self:custom.parameters.PrivateSubnet1}
+      AvailabilityZone: ${self:provider.region}a
+      Tags:
+      - Key: Name
+        Value: GWDATAPrivateSubnet1
+  GWDATAPrivateSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId:
+        Ref:  GWDATAVPC
+      CidrBlock: ${self:custom.parameters.PrivateSubnet2}
+      AvailabilityZone: ${self:provider.region}b
+      Tags:
+      - Key: Name
+        Value: GWDATAPrivateSubnet2
+  GWDATADBSubnet1:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId:
+        Ref:  GWDATAVPC
+      CidrBlock: ${self:custom.parameters.DatabaseSubnet1}
+      AvailabilityZone: ${self:provider.region}a
+      Tags:
+      - Key: Name
+        Value: GWDATADBSubnet1
+  GWDATADBSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId:
+        Ref:  GWDATAVPC
+      CidrBlock: ${self:custom.parameters.DatabaseSubnet2}
+      AvailabilityZone: ${self:provider.region}b
+      Tags:
+      - Key: Name
+        Value: GWDATADBSubnet2
+  GWDATAPublicRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId:  
+        Ref:  GWDATAVPC
+      Tags:
+      - Key: Name
+        Value: GWDATAPublicRouteTable
+  GWDATAPublicRoute: 
+    Type: 'AWS::EC2::Route'
+    DependsOn: GWDATAInternetGatewayAttach
+    Properties:
+      RouteTableId:
+        Ref: GWDATAPublicRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId:
+        Ref: GWDATAInternetGateway
+  GWDATAPrivateRouteTable1:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId:  
+        Ref:  GWDATAVPC
+      Tags:
+      - Key: Name
+        Value: GWDATAPrivateRouteTable1
+  GWDATAPrivateRouteTable2:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId:  
+        Ref:  GWDATAVPC
+      Tags:
+      - Key: Name
+        Value: GWDATAPrivateRouteTable2
+  GWDATAPublicSubnet1RouteTableAssosciation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId:
+        Ref:  GWDATAPublicSubnet1
+      RouteTableId:
+        Ref:  GWDATAPublicRouteTable
+  GWDATAPublicSubnet2RouteTableAssosciation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId:
+        Ref:  GWDATAPublicSubnet2
+      RouteTableId:
+        Ref:  GWDATAPublicRouteTable
+  GWDATAPrivateSubnet1RouteTableAssosciation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId:
+        Ref:  GWDATAPrivateSubnet1
+      RouteTableId:
+        Ref:  GWDATAPrivateRouteTable1
+  GWDATAPrivateSubnet2RouteTableAssosciation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId:
+        Ref:  GWDATAPrivateSubnet2
+      RouteTableId:
+        Ref:  GWDATAPrivateRouteTable2
+  GWDATADBSubnet1RouteTableAssosciation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId:
+        Ref:  GWDATADBSubnet1
+      RouteTableId:
+        Ref:  GWDATAPrivateRouteTable1
+  GWDATADBSubnet2RouteTableAssosciation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId:
+        Ref: GWDATADBSubnet2
+      RouteTableId:
+        Ref: GWDATAPrivateRouteTable2
+  GWDATAElasticIP1:
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: vpc
+      Tags:
+      - Key: Name
+        Value: GWDATAElasticIP1
+  GWDATAElasticIP2:
+    Type: 'AWS::EC2::EIP'
+    Properties:
+      Domain: vpc
+      Tags:
+      - Key: Name
+        Value: GWDATAElasticIP2
+  GWDATANATGateway1:
+    Type: 'AWS::EC2::NatGateway'
+    Properties:
+      AllocationId: !GetAtt GWDATAElasticIP1.AllocationId
+      SubnetId:
+        Ref: GWDATAPublicSubnet1
+      Tags:
+      - Key: Name
+        Value: GWDATANATGateway1
+  GWDATANATGateway2:
+    Type: 'AWS::EC2::NatGateway'
+    Properties:
+      AllocationId: !GetAtt GWDATAElasticIP2.AllocationId
+      SubnetId:
+        Ref:  GWDATAPublicSubnet2
+      Tags:
+      - Key: Name
+        Value: GWDATANATGateway2
+  GWDATAPrivateRoute1: 
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId:
+        Ref:  GWDATAPrivateRouteTable1
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId:
+        Ref:  GWDATANATGateway1
+  GWDATAPrivateRoute2: 
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId:
+        Ref: GWDATAPrivateRouteTable2
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId:
+        Ref:  GWDATANATGateway2
+  GWDATAVPCSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: 'VPC Security Group'
+      VpcId:
+         Ref: GWDATAVPC
+      SecurityGroupIngress:
+        - CidrIp: '0.0.0.0/0'
+          IpProtocol: '-1'
+      SecurityGroupEgress:
+        - CidrIp: '10.10.0.0/16'
+          IpProtocol: -1
+      Tags:
+      - Key: Name
+        Value: GWDATAVPCSecurityGroup       
+  GWDATAVPCFlowLogRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 'vpc-flow-logs.amazonaws.com'
+            Action: 'sts:AssumeRole'
+  GWDATAVPCFlowLog:
+    Type: 'AWS::EC2::FlowLog'
+    Properties:
+      DeliverLogsPermissionArn: !GetAtt GWDATAVPCFlowLogRole.Arn
+      LogGroupName: 'GWDATAVPCFlowLogs'
+      ResourceId:
+        Ref: GWDATAVPC
+      ResourceType: 'VPC'
+      TrafficType: 'ALL'

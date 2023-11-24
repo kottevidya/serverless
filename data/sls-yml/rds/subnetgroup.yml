@@ -1,0 +1,8 @@
+  Resources:
+    MyDBSubnetGroup:
+      Type: 'AWS::RDS::DBSubnetGroup'
+      Properties:
+        DBSubnetGroupDescription: 'Your DB Subnet Group Description'
+        SubnetIds:
+          - Ref: DatabaseSubnet1
+          - Ref: DatabaseSubnet2
