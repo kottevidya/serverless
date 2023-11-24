@@ -55,10 +55,12 @@ jobs:
        npm install -g serverless
    - name: Deploy to AWS
      run: |
-       cd ./data 
+       cd ./data
+       ls -lrt
        rm package-lock.json
        npm install -g npm@latest
-       npm ci --legacy-peer-deps && && serverless deploy --stage test --verbose --debug *
+       npm ci --legacy-peer-deps 
+       serverless deploy --stage test --verbose --debug *
      env:
        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
